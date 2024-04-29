@@ -27,13 +27,16 @@ export class ItemsInfo {
   factory_number: string;
 
   @Column()
-  period_use: Date;
+  period_use: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   cost: number;
 
   @Column()
   date_commissioning: Date;
+
+  @Column({ nullable: true, type: 'decimal', precision: 10, scale: 2 })
+  depreciation?: number;
 
   @DeleteDateColumn()
   delete_date: Date;

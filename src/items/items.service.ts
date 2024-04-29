@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -34,7 +34,14 @@ export class ItemsService {
     } = createItemDto;
     const item = new Item();
     const brand: ItemsBrand = await this.itemsBrandsService.findOne(brand_id);
-    const info = this.itemsInfoService.create({ ...itemsInfo, brand });
+    const { cost, period_use } = itemsInfo;
+    const depreciation =
+      cost >= 40000 ? Number((cost / period_use).toFixed(2)) : null;
+    const info = this.itemsInfoService.create({
+      ...itemsInfo,
+      depreciation,
+      brand,
+    });
     Object.assign(item, { name, decommissioned, sku, info });
     item.location = await this.itemsLocationService.findOne(location_id);
     item.responsible = await this.usersService.findOne(responsible_id);
@@ -53,7 +60,7 @@ export class ItemsService {
   }
 
   async findOne(id: string) {
-    return await this.itemsRepository.findOne({
+    const result = await this.itemsRepository.findOne({
       where: {
         id: id,
       },
@@ -65,6 +72,10 @@ export class ItemsService {
         location: true,
       },
     });
+    if (!result) {
+      throw new BadRequestException('Такого предмета не существует');
+    }
+    return result;
   }
 
   async update(id: string, updateItemDto: UpdateItemDto) {

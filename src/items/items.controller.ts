@@ -1,20 +1,12 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
-import { ItemsService } from './items.service';
-import { CreateItemDto } from './dto/create-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Item } from './entities/item.entity';
-import { PaginationItemDto } from './dto/pagination-item.dto';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { ItemsService } from "./items.service";
+import { CreateItemDto } from "./dto/create-item.dto";
+import { UpdateItemDto } from "./dto/update-item.dto";
+import { ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Item } from "./entities/item.entity";
+import { PaginationItemDto } from "./dto/pagination-item.dto";
 import { FindOneItemsDto } from "./dto/find-one-items.dto";
+
 @ApiTags('items')
 @Controller('items')
 export class ItemsController {
@@ -41,7 +33,10 @@ export class ItemsController {
 
   @ApiResponse({ type: Item })
   @Patch(':id')
-  update(@Param() { id }: FindOneItemsDto, @Body() updateItemDto: UpdateItemDto) {
+  update(
+    @Param() { id }: FindOneItemsDto,
+    @Body() updateItemDto: UpdateItemDto,
+  ) {
     return this.itemsService.update(id, updateItemDto);
   }
 

@@ -1,7 +1,7 @@
 import { EntitySchema } from 'typeorm';
 import { ItemsInfo } from './entities/items-info.entity';
 import { Item } from '../items/entities/item.entity';
-import { ItemsBrand } from "../items-brands/entities/items-brand.entity";
+import { ItemsBrand } from '../items-brands/entities/items-brand.entity';
 
 export const ItemsInfoSchema = new EntitySchema<ItemsInfo>({
   name: 'ItemsInfo',
@@ -19,12 +19,18 @@ export const ItemsInfoSchema = new EntitySchema<ItemsInfo>({
       nullable: true,
     },
     period_use: {
-      type: Date,
+      type: Number,
     },
     cost: {
       type: 'decimal',
       precision: 10,
       scale: 2,
+    },
+    depreciation: {
+      type: 'decimal',
+      precision: 10,
+      scale: 2,
+      nullable: true
     },
     date_commissioning: {
       type: Date,
@@ -44,5 +50,5 @@ export const ItemsInfoSchema = new EntitySchema<ItemsInfo>({
       type: 'many-to-one',
       target: ItemsBrand,
     },
-  }
+  },
 });

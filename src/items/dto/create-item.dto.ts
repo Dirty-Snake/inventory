@@ -4,6 +4,7 @@ import {
   IsDate,
   IsDecimal,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -56,8 +57,9 @@ export class CreateItemDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsString()
-  period_use: string;
+  @Type(() => Number)
+  @IsNumber()
+  period_use: number;
 
   @IsDecimal({ decimal_digits: '10' })
   @IsNotEmpty()
