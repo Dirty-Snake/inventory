@@ -1,5 +1,7 @@
 import { EntitySchema } from 'typeorm';
 import { ItemsInfo } from './entities/items-info.entity';
+import { Item } from '../items/entities/item.entity';
+import { ItemsBrand } from "../items-brands/entities/items-brand.entity";
 
 export const ItemsInfoSchema = new EntitySchema<ItemsInfo>({
   name: 'ItemsInfo',
@@ -10,9 +12,6 @@ export const ItemsInfoSchema = new EntitySchema<ItemsInfo>({
       generated: 'uuid',
     },
     model: {
-      type: String,
-    },
-    stamp: {
       type: String,
     },
     factory_number: {
@@ -40,4 +39,10 @@ export const ItemsInfoSchema = new EntitySchema<ItemsInfo>({
       type: Date,
     },
   },
+  relations: {
+    brand: {
+      type: 'many-to-one',
+      target: ItemsBrand,
+    },
+  }
 });

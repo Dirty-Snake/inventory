@@ -1,26 +1,106 @@
 import { Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import * as bcrypt from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Item } from './entities/item.entity';
+import { Repository } from 'typeorm';
+import { ItemsLocationService } from '../items-locations/items-locations.service';
+import { UsersService } from '../users/users.service';
+import { ItemsLocation } from '../items-locations/entities/item-location.entity';
+import { User } from '../users/entities/user.entity';
+import { ItemsInfo } from '../items-info/entities/items-info.entity';
+import { ItemsBrandsService } from '../items-brands/items-brands.service';
+import { ItemsBrand } from '../items-brands/entities/items-brand.entity';
+import { ItemsInfoService } from '../items-info/items-info.service';
 @Injectable()
 export class ItemsService {
-  create(createItemDto: CreateItemDto) {
-    return 'This action adds a new item';
+  constructor(
+    @InjectRepository(Item)
+    private itemsRepository: Repository<Item>,
+    private itemsLocationService: ItemsLocationService,
+    private usersService: UsersService,
+    private itemsBrandsService: ItemsBrandsService,
+    private itemsInfoService: ItemsInfoService,
+  ) {}
+  async create(createItemDto: CreateItemDto): Promise<Item> {
+    const {
+      location_id,
+      responsible_id,
+      brand_id,
+      name,
+      sku,
+      decommissioned,
+      ...itemsInfo
+    } = createItemDto;
+    const item = new Item();
+    const brand: ItemsBrand = await this.itemsBrandsService.findOne(brand_id);
+    const info = this.itemsInfoService.create({ ...itemsInfo, brand });
+    Object.assign(item, { name, decommissioned, sku, info });
+    item.location = await this.itemsLocationService.findOne(location_id);
+    item.responsible = await this.usersService.findOne(responsible_id);
+    return await this.itemsRepository.save(item);
   }
 
-  findAll() {
-    return `This action returns all items`;
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ result: Item[]; total: number }> {
+    const [result, total] = await this.itemsRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return { result, total };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} item`;
+  async findOne(id: string) {
+    return await this.itemsRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        responsible: true,
+        info: {
+          brand: true,
+        },
+        location: true,
+      },
+    });
   }
 
-  update(id: number, updateItemDto: UpdateItemDto) {
-    return `This action updates a #${id} item`;
+  async update(id: string, updateItemDto: UpdateItemDto) {
+    const {
+      location_id,
+      responsible_id,
+      brand_id,
+      name,
+      sku,
+      decommissioned,
+      ...itemsInfo
+    } = updateItemDto;
+    const item = await this.findOne(id);
+    Object.assign(item, { name, decommissioned, sku });
+    if (brand_id) {
+      const brand: ItemsBrand = await this.itemsBrandsService.findOne(brand_id);
+      Object.assign(item.info, brand, itemsInfo);
+    }
+    if (location_id) {
+      item.location = await this.itemsLocationService.findOne(location_id);
+    }
+    if (responsible_id) {
+      item.responsible = await this.usersService.findOne(responsible_id);
+    }
+    return await this.itemsRepository.save(item);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} item`;
+  async remove(id: string) {
+    const item = await this.itemsRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        info: true,
+      },
+    });
+    return await this.itemsRepository.softRemove(item);
   }
 }

@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Item } from './entities/item.entity';
+import { PaginationItemDto } from './dto/pagination-item.dto';
+import { FindOneItemsDto } from "./dto/find-one-items.dto";
+@ApiTags('items')
 @Controller('items')
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
+  @ApiResponse({ type: Item })
   @Post()
-  create(@Body() createItemDto: CreateItemDto) {
-    return this.itemsService.create(createItemDto);
+  async create(@Body() createItemDto: CreateItemDto) {
+    return await this.itemsService.create(createItemDto);
   }
 
+  @ApiResponse({ type: [Item] })
   @Get()
-  findAll() {
-    return this.itemsService.findAll();
+  async findAll(@Query() paginationItemDto: PaginationItemDto) {
+    const { page, limit } = paginationItemDto;
+    return await this.itemsService.findAll(page, limit);
   }
 
+  @ApiResponse({ type: Item })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.itemsService.findOne(+id);
+  async findOne(@Param() { id }: FindOneItemsDto): Promise<Item> {
+    return await this.itemsService.findOne(id);
   }
 
+  @ApiResponse({ type: Item })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto) {
-    return this.itemsService.update(+id, updateItemDto);
+  update(@Param() { id }: FindOneItemsDto, @Body() updateItemDto: UpdateItemDto) {
+    return this.itemsService.update(id, updateItemDto);
   }
 
+  @ApiResponse({ type: Item })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.itemsService.remove(+id);
+  remove(@Param() { id }: FindOneItemsDto) {
+    return this.itemsService.remove(id);
   }
 }

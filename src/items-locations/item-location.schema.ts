@@ -1,9 +1,9 @@
 import { EntitySchema } from 'typeorm';
-import { ItemLocation } from './entities/item-location.entity';
+import { ItemsLocation } from './entities/item-location.entity';
 import { Item } from '../items/entities/item.entity'; // Путь к сущности ItemLocation
 
-export const ItemLocationSchema = new EntitySchema<ItemLocation>({
-  name: 'ItemLocation',
+export const ItemsLocationSchema = new EntitySchema<ItemsLocation>({
+  name: 'ItemsLocation',
   columns: {
     id: {
       type: String,

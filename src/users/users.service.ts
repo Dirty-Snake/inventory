@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -39,12 +39,16 @@ export class UsersService {
       select.email = true;
       select.password = true;
     }
-    return await this.userRepository.findOne({
+    const result = await this.userRepository.findOne({
       select: select,
       where: {
         id: id,
       },
     });
+    if (!result) {
+      throw new BadRequestException('Такого пользователя не существует');
+    }
+    return result;
   }
 
   async findUser(username: string) {

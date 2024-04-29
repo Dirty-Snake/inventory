@@ -1,26 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { CreateItemsInfoDto } from './dto/create-items-info.dto';
-import { UpdateItemsInfoDto } from './dto/update-items-info.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ItemsInfo } from './entities/items-info.entity';
+import { Repository } from 'typeorm';
+import { ItemInfoInterface } from "./interfaces/item-info.interface";
 
 @Injectable()
 export class ItemsInfoService {
-  create(createItemsInfoDto: CreateItemsInfoDto) {
-    return 'This action adds a new itemsInfo';
+  constructor(
+    @InjectRepository(ItemsInfo)
+    private infoRepository: Repository<ItemsInfo>,
+  ) {}
+  create(itemsInfoData: ItemInfoInterface) {
+    return this.infoRepository.create(itemsInfoData);
   }
-
-  findAll() {
-    return `This action returns all itemsInfo`;
-  }
-
   findOne(id: number) {
     return `This action returns a #${id} itemsInfo`;
-  }
-
-  update(id: number, updateItemsInfoDto: UpdateItemsInfoDto) {
-    return `This action updates a #${id} itemsInfo`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} itemsInfo`;
   }
 }

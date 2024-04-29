@@ -33,7 +33,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') { id }: FindUserDto) {
+  findOne(@Param() { id }: FindUserDto) {
     return this.usersService.findOne(id);
   }
 

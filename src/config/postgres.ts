@@ -2,8 +2,9 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { registerAs } from '@nestjs/config';
 import { User } from '../users/entities/user.entity';
 import { Item } from '../items/entities/item.entity';
-import { ItemLocation } from '../items-location/entities/item-location.entity';
+import { ItemsLocation } from '../items-locations/entities/item-location.entity';
 import { ItemsInfo } from '../items-info/entities/items-info.entity';
+import { ItemsBrand } from "../items-brands/entities/items-brand.entity";
 
 export default registerAs(
   'typeOrmConfig',
@@ -17,7 +18,7 @@ export default registerAs(
     password: process.env.PG_PASS,
     database: process.env.PG_DB,
     //migrationsRun: true,
-    entities: [User, Item, ItemLocation, ItemsInfo],
+    entities: [User, Item, ItemsLocation, ItemsInfo, ItemsBrand],
     synchronize: true,
   }),
 );

@@ -3,6 +3,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../users/entities/user.entity';
+import { AuthTokenInterface } from "./interfaces/auth-token.interface";
 
 @Injectable()
 export class AuthService {
@@ -11,7 +12,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
-  async signIn(username: string, pass: string): Promise<any> {
+  async signIn(username: string, pass: string): Promise<AuthTokenInterface> {
     const user = await this.usersService.findUser(username);
     const checkPassword = await this.usersService.comparePassword(
       pass,
@@ -25,11 +26,11 @@ export class AuthService {
     // instead of the user object
     return await this.generateTokens(<User>result);
   }
-  async generateTokens(user: User) {
+  async generateTokens(user: User): Promise<AuthTokenInterface> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: user.id,
+          id: user.id,
           username: user.username,
           email: user.email,
         },
@@ -40,7 +41,7 @@ export class AuthService {
       ),
       this.jwtService.signAsync(
         {
-          sub: user.id,
+          id: user.id,
           username: user.username,
           email: user.email,
         },
@@ -54,5 +55,18 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+  async refreshToken(token: string): Promise<AuthTokenInterface>{
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: this.configService.get('REFRESH_SECRET'),
+      });
+      return this.generateTokens(payload);
+    } catch {
+      throw new UnauthorizedException();
+    }
   }
 }

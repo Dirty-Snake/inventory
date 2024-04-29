@@ -1,8 +1,11 @@
 import { EntitySchema } from 'typeorm';
 import { Item } from './entities/item.entity';
-import { ItemLocation } from '../items-location/entities/item-location.entity';
+import { ItemsLocation } from '../items-locations/entities/item-location.entity';
+import { User } from '../users/entities/user.entity';
+import { ItemsInfo } from '../items-info/entities/items-info.entity';
+import { ItemsBrand } from '../items-brands/entities/items-brand.entity';
 
-export const ItemSchema = new EntitySchema<Item>({
+export const ItemSchema: EntitySchema<Item> = new EntitySchema<Item>({
   name: 'Item',
   columns: {
     id: {
@@ -17,6 +20,9 @@ export const ItemSchema = new EntitySchema<Item>({
       type: String,
       length: 8,
     },
+    decommissioned: {
+      type: Boolean,
+    },
     delete_date: {
       type: Date,
     },
@@ -30,7 +36,15 @@ export const ItemSchema = new EntitySchema<Item>({
   relations: {
     location: {
       type: 'many-to-one',
-      target: ItemLocation,
+      target: ItemsLocation,
+    },
+    responsible: {
+      type: 'many-to-one',
+      target: User,
+    },
+    info: {
+      type: 'one-to-one',
+      target: ItemsInfo,
     },
   },
 });

@@ -3,9 +3,14 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Item } from '../../items/entities/item.entity';
+import { ItemsBrand } from '../../items-brands/entities/items-brand.entity';
 
 @Entity()
 export class ItemsInfo {
@@ -15,10 +20,10 @@ export class ItemsInfo {
   @Column()
   model: string;
 
-  @Column()
-  stamp: string;
+  @ManyToOne(() => ItemsBrand, (brand) => brand.itemsInfos)
+  brand: ItemsBrand;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 100 })
   factory_number: string;
 
   @Column()
