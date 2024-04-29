@@ -9,12 +9,14 @@ import {
 } from 'typeorm';
 import { Item } from '../../items/entities/item.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { ResponsibleHistory } from '../../responsible-histories/entities/responsible-history.entity';
 
 @Entity()
 export class User {
   @ApiProperty({
     example: '766be24d-6f78-4d8a-b838-74d066d39429',
     type: 'uuid',
+    description: 'Уникальный идентификатор',
   })
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -22,6 +24,7 @@ export class User {
   @ApiProperty({
     example: 'admin',
     type: String,
+    description: 'Логин',
   })
   @Column()
   username: string;
@@ -29,6 +32,7 @@ export class User {
   @ApiProperty({
     example: 'test@email.ru',
     type: String,
+    description: 'Эл. почта',
   })
   @Column()
   email: string;
@@ -37,11 +41,28 @@ export class User {
   password: string;
 
   @ApiProperty({
-    description: 'Дата создания',
-    type: () => [Item],
+    type: String,
+    example: 'Иванов',
+    description: 'Фамилия',
+    required: false,
   })
+  @Column({ nullable: true })
+  lastname: string;
+
+  @ApiProperty({
+    type: String,
+    example: 'Максим',
+    description: 'Имя',
+    required: false,
+  })
+  @Column({ nullable: true })
+  firstname: string;
+
   @OneToMany(() => Item, (item) => item.responsible)
   items: Item[];
+
+  @OneToMany(() => ResponsibleHistory, (histories) => histories.user)
+  histories: ResponsibleHistory[];
 
   @DeleteDateColumn()
   deleteDate: Date;

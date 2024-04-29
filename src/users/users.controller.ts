@@ -6,14 +6,20 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { FindUserDto } from './dto/find-user.dto';
-
+import { AuthGuard } from '../auth/auth.guard';
+@ApiHeader({
+  name: 'Authorization',
+  description: 'Access токен',
+})
+@UseGuards(AuthGuard)
 @ApiTags('users')
 @Controller('users')
 export class UsersController {

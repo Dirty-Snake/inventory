@@ -4,7 +4,8 @@ import { User } from '../users/entities/user.entity';
 import { Item } from '../items/entities/item.entity';
 import { ItemsLocation } from '../items-locations/entities/item-location.entity';
 import { ItemsInfo } from '../items-info/entities/items-info.entity';
-import { ItemsBrand } from "../items-brands/entities/items-brand.entity";
+import { ItemsBrand } from '../items-brands/entities/items-brand.entity';
+import { ResponsibleHistory } from '../responsible-histories/entities/responsible-history.entity';
 
 export default registerAs(
   'typeOrmConfig',
@@ -18,7 +19,14 @@ export default registerAs(
     password: process.env.PG_PASS,
     database: process.env.PG_DB,
     //migrationsRun: true,
-    entities: [User, Item, ItemsLocation, ItemsInfo, ItemsBrand],
+    entities: [
+      User,
+      Item,
+      ItemsLocation,
+      ItemsInfo,
+      ItemsBrand,
+      ResponsibleHistory,
+    ],
     synchronize: true,
   }),
 );

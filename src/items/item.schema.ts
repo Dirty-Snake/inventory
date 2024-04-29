@@ -3,7 +3,7 @@ import { Item } from './entities/item.entity';
 import { ItemsLocation } from '../items-locations/entities/item-location.entity';
 import { User } from '../users/entities/user.entity';
 import { ItemsInfo } from '../items-info/entities/items-info.entity';
-import { ItemsBrand } from '../items-brands/entities/items-brand.entity';
+import { ResponsibleHistory } from '../responsible-histories/entities/responsible-history.entity';
 
 export const ItemSchema: EntitySchema<Item> = new EntitySchema<Item>({
   name: 'Item',
@@ -45,6 +45,10 @@ export const ItemSchema: EntitySchema<Item> = new EntitySchema<Item>({
     info: {
       type: 'one-to-one',
       target: ItemsInfo,
+    },
+    histories: {
+      type: 'one-to-many',
+      target: ResponsibleHistory,
     },
   },
 });

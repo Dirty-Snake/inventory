@@ -7,21 +7,32 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Item } from '../../items/entities/item.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { ItemsInfo } from "../../items-info/entities/items-info.entity";
+import { ItemsInfo } from '../../items-info/entities/items-info.entity';
 
 @Entity()
 export class ItemsBrand {
-  @ApiProperty({ example: 'cd312e8d-0fa4-43ae-83bf-eb794ea8ce36' })
+  @ApiProperty({
+    example: 'c75f4a69-e673-43c3-b00b-ecafd042e746',
+    type: 'uuid',
+    description: 'Уникальный идентификатор',
+  })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ example: 'Dell' })
+  @ApiProperty({
+    type: String,
+    example: 'DELL',
+    description: 'Название',
+  })
   @Column()
   name: string;
 
-  @ApiProperty({ required: false, example: 'Какое-то описание' })
+  @ApiProperty({
+    required: false,
+    example: 'Какое-то описание',
+    description: 'Описание',
+  })
   @Column({ nullable: true })
   description?: string;
 
@@ -31,11 +42,17 @@ export class ItemsBrand {
   @DeleteDateColumn({ select: false })
   delete_date: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Date,
+    description: 'Дата обновления',
+  })
   @UpdateDateColumn()
   update_date: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Date,
+    description: 'Дата создания',
+  })
   @CreateDateColumn()
   create_date: Date;
 }

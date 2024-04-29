@@ -3,24 +3,25 @@ import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from './entities/item.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { ItemsLocationService } from '../items-locations/items-locations.service';
 import { UsersService } from '../users/users.service';
-import { ItemsLocation } from '../items-locations/entities/item-location.entity';
-import { User } from '../users/entities/user.entity';
-import { ItemsInfo } from '../items-info/entities/items-info.entity';
 import { ItemsBrandsService } from '../items-brands/items-brands.service';
 import { ItemsBrand } from '../items-brands/entities/items-brand.entity';
 import { ItemsInfoService } from '../items-info/items-info.service';
+import { ResponsibleHistoriesService } from '../responsible-histories/responsible-histories.service';
+
 @Injectable()
 export class ItemsService {
   constructor(
     @InjectRepository(Item)
     private itemsRepository: Repository<Item>,
+    private readonly entityManager: EntityManager,
     private itemsLocationService: ItemsLocationService,
     private usersService: UsersService,
     private itemsBrandsService: ItemsBrandsService,
     private itemsInfoService: ItemsInfoService,
+    private responsibleHistoriesService: ResponsibleHistoriesService,
   ) {}
   async create(createItemDto: CreateItemDto): Promise<Item> {
     const {
@@ -45,16 +46,42 @@ export class ItemsService {
     Object.assign(item, { name, decommissioned, sku, info });
     item.location = await this.itemsLocationService.findOne(location_id);
     item.responsible = await this.usersService.findOne(responsible_id);
-    return await this.itemsRepository.save(item);
+    try {
+      await this.entityManager.transaction(
+        async (transactionalEntityManager) => {
+          await transactionalEntityManager.save(item);
+          const history = this.responsibleHistoriesService.create(
+            item,
+            item.responsible,
+          );
+          await transactionalEntityManager.save(history);
+        },
+      );
+      return item;
+    } catch (e) {
+      console.log(e);
+      throw new BadRequestException('Ошибка создания');
+    }
+
+    //return await this.itemsRepository.save(item);
   }
 
   async findAll(
     page = 1,
     limit = 10,
+    locationId?: string,
   ): Promise<{ result: Item[]; total: number }> {
     const [result, total] = await this.itemsRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
+      where: {
+        location: {
+          id: locationId,
+        },
+      },
+      relations: {
+        location: true,
+      },
     });
     return { result, total };
   }
@@ -72,9 +99,13 @@ export class ItemsService {
         location: true,
       },
     });
+
     if (!result) {
       throw new BadRequestException('Такого предмета не существует');
     }
+    result.histories = await this.responsibleHistoriesService.findAll(
+      result.id,
+    );
     return result;
   }
 
@@ -91,16 +122,38 @@ export class ItemsService {
     const item = await this.findOne(id);
     Object.assign(item, { name, decommissioned, sku });
     if (brand_id) {
-      const brand: ItemsBrand = await this.itemsBrandsService.findOne(brand_id);
-      Object.assign(item.info, brand, itemsInfo);
+      item.info.brand = await this.itemsBrandsService.findOne(brand_id);
     }
+    Object.assign(item.info, itemsInfo);
+    const { cost, period_use } = item.info;
+    item.info.depreciation =
+      cost >= 40000 ? Number((cost / period_use).toFixed(2)) : null;
     if (location_id) {
       item.location = await this.itemsLocationService.findOne(location_id);
     }
+    const previousResponsible = item.responsible;
     if (responsible_id) {
       item.responsible = await this.usersService.findOne(responsible_id);
     }
-    return await this.itemsRepository.save(item);
+    try {
+      await this.entityManager.transaction(
+        async (transactionalEntityManager) => {
+          await transactionalEntityManager.save(item);
+          if (responsible_id && previousResponsible.id !== responsible_id) {
+            const history = this.responsibleHistoriesService.create(
+              item,
+              item.responsible,
+            );
+            await transactionalEntityManager.save(history);
+          }
+        },
+      );
+      return item;
+    } catch (e) {
+      console.log(e);
+      throw new BadRequestException('Ошибка создания');
+    }
+    //return await this.itemsRepository.save(item);
   }
 
   async remove(id: string) {

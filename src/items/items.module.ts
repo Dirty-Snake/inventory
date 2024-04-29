@@ -7,6 +7,7 @@ import { ItemsLocationModule } from '../items-locations/items-locations.module';
 import { UsersModule } from '../users/users.module';
 import { ItemsBrandsModule } from '../items-brands/items-brands.module';
 import { ItemsInfoModule } from "../items-info/items-info.module";
+import { ResponsibleHistoriesModule } from "../responsible-histories/responsible-histories.module";
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { ItemsInfoModule } from "../items-info/items-info.module";
     ItemsLocationModule,
     UsersModule,
     ItemsBrandsModule,
-    ItemsInfoModule
+    ItemsInfoModule,
+    ResponsibleHistoriesModule,
   ],
   controllers: [ItemsController],
   providers: [ItemsService],

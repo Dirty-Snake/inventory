@@ -1,34 +1,33 @@
 import {
-  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  OneToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 import { Item } from '../../items/entities/item.entity';
 import { ApiProperty } from '@nestjs/swagger';
+
 @Entity()
-export class ItemsLocation {
+export class ResponsibleHistory {
   @ApiProperty({
+    example: 'c75f4a69-e673-43c3-b00b-ecafd042e746',
     type: 'uuid',
-    example: '6ac71bc3-de3f-434e-909d-15b5b44c3e7e',
     description: 'Уникальный идентификатор',
   })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ApiProperty({
-    type: String,
-    example: 'Основной',
-    description: 'Название локации',
+    type: () => User,
   })
-  @Column()
-  name: string;
+  @ManyToOne(() => User, (user) => user.histories)
+  user: User;
 
-  @OneToMany(() => Item, (item) => item.location)
-  items: Item[];
+  @ManyToOne(() => Item, (item) => item.histories)
+  item: Item;
 
   @DeleteDateColumn({ select: false })
   delete_date: Date;

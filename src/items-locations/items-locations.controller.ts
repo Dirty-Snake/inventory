@@ -7,14 +7,21 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ItemsLocationService } from './items-locations.service';
 import { CreateItemsLocationDto } from './dto/create-items-location.dto';
 import { UpdateItemsLocationDto } from './dto/update-items-location.dto';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiHeader, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ItemsLocation } from './entities/item-location.entity';
 import { FindOneItemsLocationDto } from './dto/find-one-items-location.dto';
 import { PaginationItemsLocationDto } from './dto/pagination-items-location.dto';
+import { AuthGuard } from '../auth/auth.guard';
+@UseGuards(AuthGuard)
+@ApiHeader({
+  name: 'Authorization',
+  description: 'Access токен',
+})
 @ApiTags('items-locations')
 @Controller('items-locations')
 export class ItemsLocationController {

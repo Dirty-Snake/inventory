@@ -1,12 +1,28 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
-import { ItemsService } from "./items.service";
-import { CreateItemDto } from "./dto/create-item.dto";
-import { UpdateItemDto } from "./dto/update-item.dto";
-import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Item } from "./entities/item.entity";
-import { PaginationItemDto } from "./dto/pagination-item.dto";
-import { FindOneItemsDto } from "./dto/find-one-items.dto";
-
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ItemsService } from './items.service';
+import { CreateItemDto } from './dto/create-item.dto';
+import { UpdateItemDto } from './dto/update-item.dto';
+import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Item } from './entities/item.entity';
+import { PaginationItemDto } from './dto/pagination-item.dto';
+import { FindOneItemsDto } from './dto/find-one-items.dto';
+import { AuthGuard } from '../auth/auth.guard';
+import { FilterItemDto } from './dto/filter-item.dto';
+@UseGuards(AuthGuard)
+@ApiHeader({
+  name: 'Authorization',
+  description: 'Access токен',
+})
 @ApiTags('items')
 @Controller('items')
 export class ItemsController {
@@ -20,9 +36,11 @@ export class ItemsController {
 
   @ApiResponse({ type: [Item] })
   @Get()
-  async findAll(@Query() paginationItemDto: PaginationItemDto) {
-    const { page, limit } = paginationItemDto;
-    return await this.itemsService.findAll(page, limit);
+  async findAll(
+    @Query() { page, limit }: PaginationItemDto,
+    @Query() { location_id }: FilterItemDto,
+  ) {
+    return await this.itemsService.findAll(page, limit, location_id);
   }
 
   @ApiResponse({ type: Item })

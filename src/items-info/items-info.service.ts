@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemsInfo } from './entities/items-info.entity';
 import { Repository } from 'typeorm';
-import { ItemInfoInterface } from "./interfaces/item-info.interface";
+import { ItemInfoInterface } from './interfaces/item-info.interface';
 
 @Injectable()
 export class ItemsInfoService {
@@ -13,7 +13,14 @@ export class ItemsInfoService {
   create(itemsInfoData: ItemInfoInterface) {
     return this.infoRepository.create(itemsInfoData);
   }
-  findOne(id: number) {
-    return `This action returns a #${id} itemsInfo`;
+  async findOne(itemId) {
+    return await this.infoRepository.findOne({
+      relations: {
+        brand: true,
+      },
+      where:{
+
+      }
+    });
   }
 }

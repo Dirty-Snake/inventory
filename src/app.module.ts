@@ -10,10 +10,13 @@ import postgres from './config/postgres';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ItemsBrandsModule } from './items-brands/items-brands.module';
+import { JwtModule } from "@nestjs/jwt";
+import { ResponsibleHistoriesModule } from './responsible-histories/responsible-histories.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({isGlobal: true}),
+    JwtModule.register({global: true}),
     TypeOrmModule.forRoot(postgres()),
     ItemsModule,
     ItemsInfoModule,
@@ -21,6 +24,7 @@ import { ItemsBrandsModule } from './items-brands/items-brands.module';
     UsersModule,
     AuthModule,
     ItemsBrandsModule,
+    ResponsibleHistoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
