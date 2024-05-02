@@ -29,6 +29,7 @@ export class ItemsService {
       responsible_id,
       brand_id,
       name,
+      description,
       sku,
       decommissioned,
       ...itemsInfo
@@ -43,7 +44,7 @@ export class ItemsService {
       depreciation,
       brand,
     });
-    Object.assign(item, { name, decommissioned, sku, info });
+    Object.assign(item, { name, decommissioned, sku, info, description });
     item.location = await this.itemsLocationService.findOne(location_id);
     item.responsible = await this.usersService.findOne(responsible_id);
     try {
@@ -82,6 +83,10 @@ export class ItemsService {
       relations: {
         location: true,
       },
+      order: {
+        decommissioned: 'ASC',
+        create_date: 'ASC',
+      },
     });
     return { result, total };
   }
@@ -116,11 +121,12 @@ export class ItemsService {
       brand_id,
       name,
       sku,
+      description,
       decommissioned,
       ...itemsInfo
     } = updateItemDto;
     const item = await this.findOne(id);
-    Object.assign(item, { name, decommissioned, sku });
+    Object.assign(item, { name, decommissioned, sku, description });
     if (brand_id) {
       item.info.brand = await this.itemsBrandsService.findOne(brand_id);
     }
@@ -153,7 +159,6 @@ export class ItemsService {
       console.log(e);
       throw new BadRequestException('Ошибка создания');
     }
-    //return await this.itemsRepository.save(item);
   }
 
   async remove(id: string) {

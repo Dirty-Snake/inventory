@@ -33,6 +33,9 @@ export class ItemsBrandsService {
     const [result, total] = await this.brandRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
+      order: {
+        name: 'ASC',
+      },
     });
     return { result, total };
   }

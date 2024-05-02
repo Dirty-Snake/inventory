@@ -16,6 +16,9 @@ export const ItemSchema: EntitySchema<Item> = new EntitySchema<Item>({
     name: {
       type: String,
     },
+    description: {
+      type: String,
+    },
     sku: {
       type: String,
       length: 8,

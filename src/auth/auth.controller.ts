@@ -36,15 +36,15 @@ export class AuthController {
       signInDto.username,
       signInDto.password,
     );
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 7);
+    const expiresIn = new Date();
+    expiresIn.setDate(expiresIn.getDate() + 7);
     response.cookie('refresh', refreshToken, {
       httpOnly: true,
       secure: true,
-      expires: expires,
+      expires: expiresIn,
       path: 'auth',
     });
-    return { accessToken };
+    return { accessToken, expiresIn: 60 };
   }
   @ApiResponse({
     type: AccessToken,

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -13,12 +13,14 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const { username, email, password } = createUserDto;
+    const { username, email, password, firstname, lastname } = createUserDto;
     const user = new User();
     const hashPassword = await this.hashPassword(password);
     user.password = hashPassword;
     user.username = username;
     user.email = email;
+    user.firstname = firstname;
+    user.lastname = lastname;
     return await this.userRepository.save(user);
   }
   async hashPassword(password: string): Promise<string> {
@@ -28,8 +30,12 @@ export class UsersService {
   async comparePassword(password, hash) {
     return await bcrypt.compare(password, hash);
   }
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    return await this.userRepository.find({
+      order: {
+        username: 'ASC',
+      },
+    });
   }
 
   async findOne(id: string, password?: boolean): Promise<User> {

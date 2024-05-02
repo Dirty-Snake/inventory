@@ -39,4 +39,8 @@ export class AccessToken {
     type: String,
   })
   readonly accessToken: string;
+  @ApiProperty({
+    type: Number,
+  })
+  expiresIn: number;
 }

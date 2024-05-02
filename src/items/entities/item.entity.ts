@@ -35,6 +35,14 @@ export class Item {
   name: string;
 
   @ApiProperty({
+    type: String,
+    example: 'Принтер DELL',
+    description: 'Название',
+  })
+  @Column({ nullable: true })
+  description: string;
+
+  @ApiProperty({
     type: Boolean,
     example: true,
     description: 'Списание предмета',

@@ -11,13 +11,18 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateItemDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  description: string;
 
   @ApiProperty()
   @IsUUID()
@@ -72,8 +77,7 @@ export class CreateItemDto {
   date_commissioning: Date;
 
   @ApiProperty({ default: false })
-  @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => value === 'true')
   @IsBoolean()
   decommissioned?: boolean;
 }

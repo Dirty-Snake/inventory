@@ -28,6 +28,9 @@ export class ItemsLocationService {
     const [result, total] = await this.itemLocationRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
+      order: {
+        name: 'ASC',
+      },
     });
     return { result, total };
   }
